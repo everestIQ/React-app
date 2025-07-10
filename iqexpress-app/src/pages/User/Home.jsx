@@ -91,7 +91,7 @@ function Home() {
                   </p>
                   {/* Image related to logistics */}
                   <img src="./images/Logistics.jpeg" className="img-fluid rounded" alt="Logistics Warehouse" />
-                </div>
+                </div>10
               </div>
             </div>
           </div>

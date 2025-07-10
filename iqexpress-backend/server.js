@@ -5,6 +5,10 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { connectDB } = require('./config/database'); // Import connectDB from the new database.js
+// --- IMPORTANT: Import your models here so Sequelize can find them ---
+// This import makes Sequelize aware of the Shipment model
+require('./models/Shipment'); // Just require it, no need to assign to a variable here if not used directly
+// This import is necessary to ensure the model is registered with Sequelize
 
 // Call the database connection function
 connectDB();
