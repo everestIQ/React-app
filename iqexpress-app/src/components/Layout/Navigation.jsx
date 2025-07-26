@@ -1,10 +1,15 @@
+// iqexpress-app/src/components/Layout/Navigation.jsx
+
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // <--- CORRECTED: Import Link specifically
 
 function Navigation() {
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container">
+        {/* Your brand link should also use Link */}
+        <Link className="navbar-brand" to="/">iQexpress</Link> 
+
         <button
           className="navbar-toggler"
           type="button"
@@ -23,9 +28,9 @@ function Navigation() {
                 Home
               </Link>
             </li>
-             <li className="nav-item">
-             <Link className="nav-link" to="/services">
-               Services
+              <li className="nav-item">
+              <Link className="nav-link" to="/services">
+                Services
               </Link>
             </li>
             <li className="nav-item">
@@ -34,9 +39,9 @@ function Navigation() {
               </Link>
             </li>
             <li className="nav-item dropdown">
-              <Link
+              <Link // Make sure this is also Link if it's a router navigation
                 className="nav-link dropdown-toggle"
-                to="#"
+                to="#" // Consider if this should be a real path or just a placeholder for JS dropdown
                 role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"

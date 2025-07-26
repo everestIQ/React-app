@@ -1,7 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; // Import Link for internal navigation
-import Fade from 'react-reveal/Fade'; // Import Fade for animation
-import Slide from 'react-reveal/Slide'; // Import Slide for animation
 
 function Home() {
   return (

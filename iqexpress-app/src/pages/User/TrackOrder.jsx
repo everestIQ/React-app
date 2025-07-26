@@ -1,111 +1,151 @@
+// iqexpress-app/src/pages/TrackOrder.jsx
+
 import React, { useState } from 'react';
+// import Fade from 'react-reveal/Fade'; // Removed if not used
 
 function TrackOrder() {
-  const [trackingNumberInput, setTrackingNumberInput] = useState('');
-  const [trackingData, setTrackingData] = useState(null);
+  const [trackingNumber, setTrackingNumber] = useState('');
+  const [shipmentData, setShipmentData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
 
-  const handleInputChange = (event) => {
-    setTrackingNumberInput(event.target.value);
-  };
-
-  const handleTrackSubmit = async (event) => {
-    event.preventDefault(); // Prevent default form submission behavior
-
-    if (!trackingNumberInput) {
-      setError('Please enter a tracking number.');
-      setTrackingData(null);
-      return;
-    }
-
+  const handleTrackSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior (page reload)
     setLoading(true);
-    setError('');
-    setTrackingData(null); // Clear previous tracking data
+    setError(null);
+    setShipmentData(null); // Clear previous data
 
     try {
-      // Make API call to your Node.js backend
-      const response = await fetch(`/api/track?trackingNumber=${trackingNumberInput}`); // Using GET for tracking lookup
+      // --- UPDATED FETCH CALL HERE ---
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/track/${trackingNumber}`);
+      const data = await response.json();
 
       if (!response.ok) {
-        // If response is not 2xx, it's an error
-        const errorData = await response.json(); // Try to parse error message from backend
-        throw new Error(errorData.message || 'Could not fetch tracking information. Please try again.');
+        throw new Error(data.message || 'Failed to fetch shipment details.');
       }
 
-      const data = await response.json();
-      if (data && data.trackingNumber) { // Ensure tracking data is returned
-        setTrackingData(data);
-      } else {
-        setError('Tracking number not found or no details available.');
-      }
-
+      setShipmentData(data);
     } catch (err) {
-      console.error('Error tracking order:', err);
-      setError(err.message || 'An unexpected error occurred while tracking your order.');
+      setError(err.message);
+      console.error('Error fetching shipment:', err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Track Your Order</h2>
+    <section className="track-order py-5 bg-light">
+      <div className="container">
+        {/* Removed Fade components if not used */}
+        <h2 className="text-center mb-4">Track Your Shipment</h2>
+        <p className="text-center lead mb-5">
+          Enter your tracking number below to get the latest status update on your package.
+        </p>
 
-      <form onSubmit={handleTrackSubmit} className="mb-4">
-        <div className="input-group">
-          <input
-            type="text"
-            className="form-control form-control-lg"
-            placeholder="Enter your tracking number"
-            value={trackingNumberInput}
-            onChange={handleInputChange}
-            disabled={loading}
-            required
-          />
-          <button
-            type="submit"
-            className="btn btn-primary btn-lg"
-            disabled={loading}
-          >
-            {loading ? 'Tracking...' : 'Track'}
-          </button>
-        </div>
-        {error && <div className="text-danger mt-2">{error}</div>}
-      </form>
+        <div className="row justify-content-center">
+          <div className="col-md-8 col-lg-6">
+            <div className="card shadow-sm border-0">
+              <div className="card-body p-4">
+                <form onSubmit={handleTrackSubmit}>
+                  <div className="mb-3">
+                    <label htmlFor="trackingNumber" className="form-label">Tracking Number</label>
+                    <input
+                      type="text"
+                      className="form-control form-control-lg"
+                      id="trackingNumber"
+                      placeholder="e.g., IQX123456789"
+                      value={trackingNumber}
+                      onChange={(e) => setTrackingNumber(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="d-grid">
+                    <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
+                      {loading ? 'Tracking...' : 'Track Shipment'}
+                    </button>
+                  </div>
+                </form>
 
-      {trackingData && (
-        <div className="card shadow-sm">
-          <div className="card-header bg-primary text-white">
-            <h3>Tracking Details for: {trackingData.trackingNumber}</h3>
-          </div>
-          <div className="card-body">
-            <p><strong>Status:</strong> <span className={`badge ${trackingData.status === 'Delivered' ? 'bg-success' : 'bg-warning text-dark'}`}>{trackingData.status}</span></p>
-            <p><strong>Last Updated:</strong> {new Date(trackingData.updatedAt).toLocaleString()}</p>
-            {trackingData.productId && <p><strong>Product ID:</strong> {trackingData.productId}</p>}
-            {/* Add more details as your backend provides them, e.g., location history */}
-            {trackingData.locationHistory && trackingData.locationHistory.length > 0 && (
-              <div>
-                <h4>History:</h4>
-                <ul className="list-group list-group-flush">
-                  {trackingData.locationHistory.map((item, index) => (
-                    <li key={index} className="list-group-item">
-                      <strong>{new Date(item.timestamp).toLocaleString()}:</strong> {item.location} - {item.statusUpdate}
-                    </li>
-                  ))}
-                </ul>
+                {loading && (
+                  <div className="text-center mt-4">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <p className="mt-2">Loading shipment data...</p>
+                  </div>
+                )}
+
+                {error && (
+                  <div className="alert alert-danger mt-4" role="alert">
+                    {error}
+                  </div>
+                )}
+
+                {shipmentData && (
+                  <div className="mt-4 p-3 bg-white border rounded">
+                    <h4 className="mb-3 text-primary">Shipment Details</h4>
+                    <ul className="list-group list-group-flush">
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Tracking Number:</strong>
+                        <span>{shipmentData.trackingNumber}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Current Status:</strong>
+                        <span className={`badge ${
+                            shipmentData.status === 'Delivered' ? 'bg-success' :
+                            shipmentData.status === 'In Transit' ? 'bg-info' :
+                            'bg-warning'
+                          }`}>{shipmentData.status}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Origin:</strong>
+                        <span>{shipmentData.origin}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Destination:</strong>
+                        <span>{shipmentData.destination}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Sender:</strong>
+                        <span>{shipmentData.senderName || 'N/A'}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Receiver:</strong>
+                        <span>{shipmentData.receiverName}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Weight:</strong>
+                        <span>{shipmentData.weight} kg</span>
+                      </li>
+                      <li className="list-group-item">
+                        <strong>Location History:</strong>
+                        {shipmentData.locationHistory && shipmentData.locationHistory.length > 0 ? (
+                          <ul className="list-group list-group-flush mt-2">
+                            {shipmentData.locationHistory.map((entry, index) => (
+                              <li key={index} className="list-group-item py-1">
+                                <small>
+                                  <strong>{new Date(entry.timestamp).toLocaleString()}:</strong> {entry.location} - {entry.statusUpdate}
+                                </small>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-muted mt-2">No detailed location history available yet.</p>
+                        )}
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Last Updated:</strong>
+                        <span>{new Date(shipmentData.updatedAt).toLocaleString()}</span>
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
-      )}
-
-      {!trackingData && !loading && !error && (
-        <div className="alert alert-info text-center" role="alert">
-          Enter a tracking number above to see your shipment's status.
-        </div>
-      )}
-    </div>
+      </div>
+    </section>
   );
 }
 

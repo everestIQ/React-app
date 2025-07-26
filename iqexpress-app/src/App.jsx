@@ -1,28 +1,43 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import Home from './pages/User/Home'; // We'll create these later
-import ProductDetails from './pages/User/ProductDetails';
+// iqexpress-app/src/App.jsx
+
+import { Routes, Route, useLocation } from 'react-router-dom'; // <--- Ensure useLocation is here
+import Navbar from './components/Layout/Navigation';
+import Footer from './components/Layout/footer';
+import Home from './pages/User/Home';
+import About from './pages/User/About';
+import Services from './pages/User/Services';
 import TrackOrder from './pages/User/TrackOrder';
-import Dashboard from './pages/Admin/Dashboard';
-import GenerateTracking from './pages/Admin/GenerateTracking';
-import UpdateStatus from './pages/Admin/UpdateStatus';
+import Contact from './pages/User/Contact';
+import AdminDashboard from './pages/Admin/Dashboard';
+import LoginPage from './pages/LoginPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-  return (
-    <Router>
-      <div>
+  const location = useLocation(); // <--- This line
+  console.log('App.jsx rendering, current path:', location.pathname); // <--- And this line
 
-        {/* Define the routes */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/product/:id" element={<ProductDetails />} />
-          <Route path="/track" element={<TrackOrder />} />
-          <Route path="/admin" element={<Dashboard />} />
-          <Route path="/admin/generate-tracking" element={<GenerateTracking />} />
-          <Route path="/admin/update-status" element={<UpdateStatus />} />
-        </Routes>
-      </div>
-    </Router>
+  return (
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/track" element={<TrackOrder />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+      <Footer />
+    </>
   );
 }
 
