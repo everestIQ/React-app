@@ -2,7 +2,7 @@
 
 import { Routes, Route, useLocation } from 'react-router-dom'; // <--- Ensure useLocation is here
 import Navbar from './components/Layout/Navigation';
-import Footer from './components/Layout/footer';
+import Footer from './components/Layout/Footer';
 import Home from './pages/User/Home';
 import About from './pages/User/About';
 import Services from './pages/User/Services';
