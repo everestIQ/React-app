@@ -8,7 +8,7 @@ function Navigation() {
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container">
         {/* Your brand link should also use Link */}
-        <Link className="navbar-brand" to="/">iQexpress</Link> 
+        <Link className="navbar-brand" to="/">ADC-GLOBAL</Link> 
 
         <button
           className="navbar-toggler"
